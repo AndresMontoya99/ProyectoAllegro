@@ -16,16 +16,9 @@ int main()
 
     iniciarAlegro();
 
-    do{
-        iniciarValores();;
-        imprimirMenu();
-        imprimirJuego();
-
-        stop_sample(sonidoJuego);
-
-    }while(true);
-
-
+    iniciarValores();;
+    imprimirMenu();
+    imprimirJuego();
 
     destroy_bitmap(buffer);
     destroy_bitmap(fondo);
