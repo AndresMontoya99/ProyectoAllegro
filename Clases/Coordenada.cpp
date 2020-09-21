@@ -4,6 +4,7 @@ class Coordenada{
     private:
         int x;
         int y;
+        int valor;
 
 
     public:
@@ -28,6 +29,14 @@ class Coordenada{
 
         int getY(){
             return y;
+        }
+
+        void setValor(int valor){
+            this->valor = valor;
+        }
+
+        int getValor(){
+            return valor;
         }
 
 };

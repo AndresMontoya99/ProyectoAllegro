@@ -13,11 +13,18 @@
 
 int main()
 {
-    int opcion;
 
-    iniciar();
-    imprimirMenu();
-    imprimirJuego();
+    iniciarAlegro();
+
+    do{
+        iniciarValores();;
+        imprimirMenu();
+        imprimirJuego();
+
+        stop_sample(sonidoJuego);
+
+    }while(true);
+
 
 
     destroy_bitmap(buffer);
@@ -26,7 +33,6 @@ int main()
     destroy_bitmap(header);
     destroy_bitmap(cuerpo);
     destroy_bitmap(logo);
-
 
     destroy_sample(sonidoMenu);
     destroy_sample(sonidoJuego);

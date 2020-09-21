@@ -27,8 +27,7 @@ int dir;
 int x;
 int y;
 
-int objetivoX;
-int objetivoY;
+int objetivoCont;
 
 int nivel;
 int puntos;

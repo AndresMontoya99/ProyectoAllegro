@@ -3,7 +3,7 @@ Serpiente serpiente;
 
 using namespace std;
 
-void iniciar(){
+void iniciarAlegro(){
 
     allegro_init();
     install_keyboard();
@@ -18,14 +18,24 @@ void iniciar(){
 
     srand(time(0));
 
+    sonidoMenu  = load_wav("music/comeAndGetYourLove.wav");
+    sonidoJuego = load_wav("music/animals.wav");
+
+    sonidoGanar = load_wav("music/moveYourFeet.wav");
+    sonidoPerder = load_wav("music/evilMorty.wav");
+
+    sonidoObjetivo = load_wav("music/objetivo.wav");
+}
+
+
+void iniciarValores(){
+
     imgSerpiente = 30;
     imgLogo = 50;
     imgVida = 24;
 
     x = 0;
     y = 0;
-    objetivoX = 0;
-    objetivoY = 0;
 
     nivel = 1;
     puntos = 0;
@@ -43,17 +53,13 @@ void iniciar(){
     vidasMax = 10;
     vidasAumen = 25;
 
+    objetivoCont = 3;
+
     serpiente = Serpiente();
     serpiente.guardarPosicion();
 
-
-    sonidoMenu  = load_wav("music/comeAndGetYourLove.wav");
-    sonidoJuego = load_wav("music/animals.wav");
-
-    sonidoGanar = load_wav("music/moveYourFeet.wav");
-    sonidoPerder = load_wav("music/evilMorty.wav");
-
-    sonidoObjetivo = load_wav("music/objetivo.wav");
+    objetivoXY = vector<Coordenada>{};
+    serpiente.guardarPosicion();
 }
 
 
@@ -97,126 +103,85 @@ void cambiarPantalla(){
     buffer = create_bitmap(pantallaAncho, pantallaAlto);
 }
 
-void imprimirMenu(){
+void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = -1){
 
-    pantallaAlto = 440;
-    pantallaAncho = 440;
-
-    headerAlto = 75;
-
-    titulo = "Serpiente Matematica - Menu";
-
-    cambiarPantalla();
-    cargarImagenes(true);
-    montarImagenes();
-
-    vector<string> opciones;
-
-    bool continuar = true;
-
-    opciones.push_back("Libre");
-    opciones.push_back("Numeros Pares");
-    opciones.push_back("Multiplos de 5");
-    opciones.push_back("Salir");
-
-
-    play_sample(sonidoMenu,20,150,1000,1);
-
-    do
-    {
-        clear(buffer);
-
-        montarImagenes();
-
-        textout_centre_ex(buffer, font, "Seleccione Modo de Juego", pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
-
-        int tam = opciones.size();
-
-
-        if(keypressed()){
-            char letra = readkey() >> 8;
-
-            switch(letra){
-
-                case KEY_UP:
-                    modoJuego--;
-                    if(modoJuego == 0)
-                        modoJuego = tam;
-
-                    break;
-
-                case KEY_DOWN:
-                    modoJuego++;
-                    if(modoJuego > tam)
-                        modoJuego = 1;
-                    break;
-
-                case KEY_ENTER:
-                    continuar = false;
-                    break;
-
-                case KEY_ESC:
-                    continuar = false;
-                    break;
-            }
-
-        }
-
-
-        for(int i = 0 ; i < opciones.size() ; i++){
-
-            string str = opciones[i];
-
-            if((i+1 == modoJuego)) {
-                if(str.find("-> ") == -1)
-                    str = str.replace(0, 0 ,"-> ");
-            }else{
-                if(str.find("-> ") != -1)
-                    str = str.replace(0, 3 ,"");
-
-            }
-            textout_centre_ex(buffer, font, str.c_str(), pantallaAncho/2, headerAlto + (fondoAlto/2) - (  (tam*10 * (tam/2)) - (i)*(tam * 10)  ),
-                               ((i+1 == modoJuego) ? 0x000000 : 0xFFFFFF ),((i+1 == modoJuego) ? 0xFFFFFF : 0xB6DE6B ) );
-        }
-
-        blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
-        rest(50);
-
-    }while(continuar);
-
-
-}
-
-void dibujarObjetivo(bool actualizar = false, bool primera = false){
     if(actualizar){
         serpiente.posicionDisponible();
 
         if(!primera){
 
-            play_sample(sonidoObjetivo,50,150,1000,0);
-            puntos++;
-            tamano++;
-            if(puntos % corteNivel == 0){
-                nivel++;
-                if(tasa > 1)
-                    tasa -= 1;
+            switch(modoJuego){
+
+                case 2:
+                    terminar = objetivoXY[index].getValor() % 2 != 0;
+                    break;
+                case 3:
+                    terminar = objetivoXY[index].getValor() % 5 != 0;
+                    break;
             }
 
-            if(vidas < vidasMax && puntos % vidasAumen == 0){
-                vidas++;
+            play_sample(sonidoObjetivo,50,150,1000,0);
+
+            if(!terminar){
+                puntos++;
+                tamano++;
+                if(puntos % corteNivel == 0){
+                    nivel++;
+                    if(tasa > 1)
+                        tasa -= 1;
+                }
+
+                if(vidas < vidasMax && puntos % vidasAumen == 0){
+                    vidas++;
+                }
             }
+
+
+            objetivoXY.clear();
         }
 
     }
 
-    masked_blit(objetivo,buffer, 0,0,(objetivoX*imgSerpiente)+margen+1,(objetivoY*imgSerpiente)+ headerAlto+margen+1 ,imgSerpiente,imgSerpiente);
+    bool dis = false;
 
-    ostringstream os;
-    os << puntos+9;
+    for(int i = 0 ; i < objetivoXY.size() ; i++){
 
-    masked_blit(objetivo,buffer, 0,0,(objetivoX*imgSerpiente)+margen+1,(objetivoY*imgSerpiente)+ headerAlto+margen+1 ,imgSerpiente,imgSerpiente);
-    textout_centre_ex(buffer, font, os.str().c_str(),(objetivoX*imgSerpiente)+margen+1 +14,(objetivoY*imgSerpiente)+ headerAlto+margen+1 +10,
-                                0xFFFFFF, 0xFF0000 );
+        ostringstream os;
+
+        if(actualizar && modoJuego != 1){
+
+            switch(modoJuego){
+                case 2:
+                    do{
+                        objetivoXY[i].setValor(rand() % 100 + 1);
+                        if(!dis)
+                            dis = objetivoXY[i].getValor() % 2 == 0;
+                    }while(!dis);
+
+                    break;
+
+                case 3:
+                    do{
+                        objetivoXY[i].setValor(rand() % 100 + 1);
+                        if(!dis)
+                            dis = objetivoXY[i].getValor() % 5 == 0;
+                    }while(!dis);
+
+                    break;
+            }
+        }
+
+        if(modoJuego != 1){
+            os << objetivoXY[i].getValor();
+        }
+
+
+        masked_blit(objetivo,buffer, 0,0,(objetivoXY[i].getX()*imgSerpiente)+margen+1,(objetivoXY[i].getY()*imgSerpiente)+ headerAlto+margen+1 ,imgSerpiente,imgSerpiente);
+
+
+            textout_centre_ex(buffer, font, os.str().c_str(),(objetivoXY[i].getX()*imgSerpiente)+margen+1 +14,(objetivoXY[i].getY()*imgSerpiente)+ headerAlto+margen+1 +10,
+                                        0xFFFFFF, 0xFF0000 );
+    }
 
 }
 
@@ -307,9 +272,19 @@ void movimientos(){
             }
 
             serpiente.guardarPosicion();
+
+            if(objetivoXY.size() > 0){
+                bool comer = false;
+                for(int i = 0 ; i < objetivoXY.size() && !comer ; i++){
+                    comer = x == objetivoXY[i].getX() && y == objetivoXY[i].getY();
+                    dibujarObjetivo(comer,false,i);
+                }
+            }else{
+                dibujarObjetivo(true, true);
+            }
+
             serpiente.dibujarPosicion();
 
-            dibujarObjetivo(x == objetivoX && y == objetivoY);
 
             serpiente.borrarPosicion();
 
@@ -343,4 +318,97 @@ void imprimirJuego(){
     play_sample(sonidoJuego,10,150,1000,1);
 
     movimientos();
+}
+
+
+void imprimirMenu(){
+
+    pantallaAlto = 440;
+    pantallaAncho = 440;
+
+    headerAlto = 75;
+
+    titulo = "Serpiente Matematica - Menu";
+
+    cambiarPantalla();
+    cargarImagenes(true);
+    montarImagenes();
+
+    vector<string> opciones;
+
+    bool continuar = true;
+
+    opciones.push_back("Libre");
+    opciones.push_back("Numeros Pares");
+    opciones.push_back("Multiplos de 5");
+    opciones.push_back("Salir");
+
+
+    play_sample(sonidoMenu,20,150,1000,1);
+
+    do
+    {
+        clear(buffer);
+
+        montarImagenes();
+
+        textout_centre_ex(buffer, font, "Seleccione Modo de Juego", pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
+
+        int tam = opciones.size();
+
+
+
+        if(keypressed()){
+        if(continuar){
+            char letra = readkey() >> 8;
+
+            switch(letra){
+
+                case KEY_UP:
+                    modoJuego--;
+                    if(modoJuego == 0)
+                        modoJuego = tam;
+
+                    break;
+
+                case KEY_DOWN:
+                    modoJuego++;
+                    if(modoJuego > tam)
+                        modoJuego = 1;
+                    break;
+
+                case KEY_ENTER:
+                    continuar = false;
+                    break;
+
+                case KEY_ESC:
+                    continuar = false;
+                    break;
+            }
+
+        }
+        }
+
+        for(int i = 0 ; i < opciones.size() ; i++){
+
+            string str = opciones[i];
+
+            if((i+1 == modoJuego)) {
+                if(str.find("-> ") == -1)
+                    str = str.replace(0, 0 ,"-> ");
+            }else{
+                if(str.find("-> ") != -1)
+                    str = str.replace(0, 3 ,"");
+
+            }
+            textout_centre_ex(buffer, font, str.c_str(), pantallaAncho/2, headerAlto + (fondoAlto/2) - (  (tam*10 * (tam/2)) - (i)*(tam * 10)  ),
+                               ((i+1 == modoJuego) ? 0x000000 : 0xFFFFFF ),((i+1 == modoJuego) ? 0xFFFFFF : 0xB6DE6B ) );
+        }
+
+        blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
+        rest(50);
+
+    }while(continuar);
+
+
 }

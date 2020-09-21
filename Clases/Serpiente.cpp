@@ -1,6 +1,9 @@
 
 #include "Coordenada.cpp"
 
+
+vector<Coordenada> objetivoXY;
+
 class Serpiente{
     private:
         vector<Coordenada> posiciones;
@@ -77,21 +80,31 @@ class Serpiente{
             }
         }
 
-        bool posicionDisponible(){
+        void posicionDisponible(){
 
             bool dis;
+            int contador = 0;
 
             do{
                 dis = true;
-                objetivoX = 0+rand()%29;
-                objetivoY = 0+rand()%15;
+                int objetivoX = 0+rand()%29;
+                int objetivoY = 0+rand()%15;
+
+                for(int i = 0 ; i < objetivoXY.size() && dis ; i++){
+                    dis = !(objetivoXY[i].getX() == objetivoX && objetivoXY[i].getY() == objetivoY);
+                }
 
                 for(int i = 0 ; i < posiciones.size() && dis ; i++)
                 {
                     dis = !(posiciones[i].getX() == objetivoX && posiciones[i].getY() == objetivoY);
                 }
 
-            }while(!dis);
+                if(dis){
+                    objetivoXY.push_back(Coordenada(objetivoX, objetivoY));
+                    contador++;
+                }
+
+            }while(!dis || contador < objetivoCont);
         }
 
 };
