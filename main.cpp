@@ -7,18 +7,19 @@
 #include <iostream>
 #include <sstream>
 
+#include <fstream>
+#include <nlohmann/json.hpp>
+
 #include "Adicional/VariablesGlobales.cpp"
 #include "Clases/Serpiente.cpp"
 #include "Adicional/Funciones.cpp"
 
 int main()
 {
-
     iniciarAlegro();
 
     iniciarValores();;
     imprimirMenu();
-    imprimirJuego();
 
     destroy_bitmap(buffer);
     destroy_bitmap(fondo);

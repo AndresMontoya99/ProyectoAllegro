@@ -9,6 +9,11 @@ al-gfx INFO: Closing graphics driver (6569FD70) DirectDraw window.
 al-gfx INFO: Autodetecting graphic driver.
 al-gfx INFO: The driver will wait for vsync.
 al-gfx INFO: set_gfx_card success for 940x594x32.
+al-gfx INFO: Called set_gfx_mode(2, 440, 440, 0, 0).
+al-gfx INFO: Closing graphics driver (6569FD70) DirectDraw window.
+al-gfx INFO: Autodetecting graphic driver.
+al-gfx INFO: The driver will wait for vsync.
+al-gfx INFO: set_gfx_card success for 440x440x32.
 al-gfx INFO: Called set_gfx_mode(-1, 0, 0, 0, 0).
 al-gfx INFO: Closing graphics driver (6569FD70) DirectDraw window.
 al-gfx INFO: Closing, restoring original console state.

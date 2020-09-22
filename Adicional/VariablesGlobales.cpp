@@ -1,6 +1,7 @@
 
 
 using namespace std;
+using namespace nlohmann;
 
 int pantallaAncho;
 int pantallaAlto;
@@ -53,6 +54,11 @@ BITMAP  *objetivo;
 BITMAP  *cabeza;
 BITMAP  *vida;
 BITMAP  *logo;
+BITMAP  *copa;
+BITMAP  *copa2;
+BITMAP  *perder;
+BITMAP  *perder2;
+BITMAP  *explo;
 
 
 // definimos el audio del programa

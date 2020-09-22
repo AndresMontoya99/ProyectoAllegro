@@ -21,7 +21,7 @@ void iniciarAlegro(){
     sonidoMenu  = load_wav("music/comeAndGetYourLove.wav");
     sonidoJuego = load_wav("music/animals.wav");
 
-    sonidoGanar = load_wav("music/moveYourFeet.wav");
+    sonidoGanar = load_wav("music/weAreTheChampions.wav");
     sonidoPerder = load_wav("music/evilMorty.wav");
 
     sonidoObjetivo = load_wav("music/objetivo.wav");
@@ -63,18 +63,21 @@ void iniciarValores(){
 }
 
 
-void cargarImagenes(bool menu = false){
+void cargarImagenes(){
 
     fondo = load_bitmap("img/Background.bmp",NULL);
     fondo2 = load_bitmap("img/Background2.bmp",NULL);
-    if(menu)
-        header = load_bitmap("img/HeaderMenu.bmp",NULL);
-    else
-        header = load_bitmap("img/Header.bmp",NULL);
+    header = load_bitmap("img/Header.bmp",NULL);
     cuerpo = load_bitmap("img/Cuerpo.bmp",NULL);
     objetivo = load_bitmap("img/Objectivo.bmp",NULL);
     logo = load_bitmap("img/Logo.bmp",NULL);
     vida = load_bitmap("img/Vida.bmp",NULL);
+
+    copa = load_bitmap("img/Copa.bmp",NULL);
+    copa2 = load_bitmap("img/Copa2.bmp",NULL);
+    explo = load_bitmap("img/Explosion.bmp",NULL);
+    perder = load_bitmap("img/Perder.bmp",NULL);
+    perder2 = load_bitmap("img/Perder2.bmp",NULL);
 
 }
 
@@ -136,7 +139,6 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
                 }
             }
 
-
             objetivoXY.clear();
         }
 
@@ -182,6 +184,80 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
             textout_centre_ex(buffer, font, os.str().c_str(),(objetivoXY[i].getX()*imgSerpiente)+margen+1 +14,(objetivoXY[i].getY()*imgSerpiente)+ headerAlto+margen+1 +10,
                                         0xFFFFFF, 0xFF0000 );
     }
+
+}
+
+
+bool cargarPuntaje(){
+    json imagenes;
+    ifstream people_file("json/Puntaje.json", ifstream::binary);
+    people_file >> imagenes;
+
+    bool high = puntos > imagenes["PuntajeMaximo"];
+
+    if(high){
+        json jsonfile;
+
+        jsonfile["PuntajeMaximo"] = puntos;
+
+        ofstream file("json/Puntaje.json");
+        file << jsonfile;
+    }
+
+    return high;
+}
+
+
+void imprimirResultado(){
+
+    pantallaAlto = 440;
+    pantallaAncho = 440;
+
+    headerAlto = 75;
+
+    titulo = "Serpiente Matematica - Puntaje Alto";
+
+    cambiarPantalla();
+    stop_sample(sonidoJuego);
+    int rl = 1;
+    bool continuar = true;
+
+    bool puntaje = cargarPuntaje();
+
+    play_sample(((puntaje) ?  sonidoGanar  : sonidoPerder ),20,150,1000,1);
+
+
+    do{
+
+        clear(buffer);
+        montarImagenes();
+
+        ostringstream os;
+
+        if(puntaje){
+
+            os << "Nuevo Record: " << puntos;
+            textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
+
+            masked_blit((rl == 0) ? copa : copa2,buffer, 0,0, pantallaAncho/2 - (170/2) ,margen + headerAlto+1 + (fondo2Alto/2) - (170/2) ,170, 177);
+        }else{
+            os << "Puntaje: " << puntos;
+            textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
+
+            masked_blit((rl == 0) ? perder : perder2 ,buffer, 0,0, pantallaAncho/2 - (206/2) ,margen + headerAlto+1 + (fondo2Alto/2) - (206/2) ,206, 150);
+        }
+
+        rl = ((rl == 0) ? 1 : 0 );
+
+        blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
+
+        if(key[KEY_ESC]){
+            continuar = false;
+        }
+
+        rest(200);
+
+    }while(continuar);
 
 }
 
@@ -284,8 +360,6 @@ void movimientos(){
             }
 
             serpiente.dibujarPosicion();
-
-
             serpiente.borrarPosicion();
 
             blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
@@ -298,6 +372,8 @@ void movimientos(){
         rest(tasa);
     }
 
+
+    imprimirResultado();
 }
 
 
@@ -331,7 +407,7 @@ void imprimirMenu(){
     titulo = "Serpiente Matematica - Menu";
 
     cambiarPantalla();
-    cargarImagenes(true);
+    cargarImagenes();
     montarImagenes();
 
     vector<string> opciones;
@@ -359,7 +435,7 @@ void imprimirMenu(){
 
 
         if(keypressed()){
-        if(continuar){
+
             char letra = readkey() >> 8;
 
             switch(letra){
@@ -385,8 +461,6 @@ void imprimirMenu(){
                     continuar = false;
                     break;
             }
-
-        }
         }
 
         for(int i = 0 ; i < opciones.size() ; i++){
@@ -411,4 +485,5 @@ void imprimirMenu(){
     }while(continuar);
 
 
+    imprimirJuego();
 }
