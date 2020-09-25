@@ -41,6 +41,6 @@ int main()
     destroy_sample(sonidoPerder);
     destroy_sample(sonidoObjetivo);
 
-    return 0;
+    //return 0;
 }
 END_OF_MAIN();

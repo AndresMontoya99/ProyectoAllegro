@@ -60,10 +60,7 @@ BITMAP  *copa2;
 BITMAP  *perder;
 BITMAP  *perder2;
 BITMAP  *explo;
-BITMAP  *pausa;
 
-
-// definimos el audio del programa
 SAMPLE *sonidoMenu;
 SAMPLE *sonidoJuego;
 
