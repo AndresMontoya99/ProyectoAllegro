@@ -1,7 +1,6 @@
 
 #include "Coordenada.cpp"
 
-
 vector<Coordenada> objetivoXY;
 
 class Serpiente{
@@ -33,9 +32,10 @@ class Serpiente{
 
                 for(int i = 0 ; i < posiciones.size()-1 && !terminar ; i++){
                     if(posiciones[i].getX() == x && posiciones[i].getY() == y){
+                        if(dir != 2 && dir != 3){
+                            dir = 2;
+                        }
                         terminar = true;
-
-                        cout << "Serpiente" << endl;
                     }
                 }
 
@@ -57,21 +57,20 @@ class Serpiente{
                     }
                 }
             }else{
-                cout << "Marco" << endl;
+                if(dir != 2 && dir != 3){
+                    dir = 2;
+                }
                 terminar = true;
             }
 
             if(terminar && vidas > 1){
-                if(dir != 2 && dir != 3){
-                    dir = 2;
-                }
                 x = 0;
                 y = 0;
                 vidas--;
                 posiciones.clear();
                 posiciones.push_back(Coordenada(x,y));
                 terminar = false;
-                cout << "Chance" << endl;
+                rest(100);
             }
         }
 
@@ -109,5 +108,4 @@ class Serpiente{
 
             }while(!dis || contador < objetivoCont);
         }
-
 };

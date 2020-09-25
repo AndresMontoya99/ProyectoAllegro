@@ -50,7 +50,7 @@ void iniciarValores(){
     tamano = 3;
 
     timer = 0;
-    corte = 700;
+    corte = 500;
     corteNivel = 5;
 
     vidas = 3;
@@ -82,9 +82,6 @@ void cargarImagenes(){
     explo = load_bitmap("img/Explosion.bmp",NULL);
     perder = load_bitmap("img/Perder.bmp",NULL);
     perder2 = load_bitmap("img/Perder2.bmp",NULL);
-
-
-    pausa = load_bitmap("img/Pausa.bmp",NULL);
 
 }
 
@@ -119,14 +116,8 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
 
         if(!primera){
 
-            switch(modoJuego){
-
-                case 2:
-                    terminar = objetivoXY[index].getValor() % 2 != 0;
-                    break;
-                case 3:
-                    terminar = objetivoXY[index].getValor() % 5 != 0;
-                    break;
+            if(modoJuego != 1){
+                terminar = objetivoXY[index].getValor() % ((modoJuego == 2) ? 2 : 5 ) != 0;
             }
 
             play_sample(sonidoObjetivo,50,150,1000,0);
@@ -136,8 +127,8 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
                 tamano++;
                 if(puntos % corteNivel == 0){
                     nivel++;
-                    if(corte > 50)
-                        corte -= 50;
+                    if(corte > 25)
+                        corte -= 25;
                 }
 
                 if(vidas < vidasMax && puntos % vidasAumen == 0){
@@ -187,8 +178,8 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
         masked_blit(objetivo,buffer, 0,0,(objetivoXY[i].getX()*imgSerpiente)+margen+1,(objetivoXY[i].getY()*imgSerpiente)+ headerAlto+margen+1 ,imgSerpiente,imgSerpiente);
 
 
-            textout_centre_ex(buffer, font, os.str().c_str(),(objetivoXY[i].getX()*imgSerpiente)+margen+1 +14,(objetivoXY[i].getY()*imgSerpiente)+ headerAlto+margen+1 +10,
-                                        0xFFFFFF, 0xFF0000 );
+        textout_centre_ex(buffer, font, os.str().c_str(),(objetivoXY[i].getX()*imgSerpiente)+margen+1 +14,(objetivoXY[i].getY()*imgSerpiente)+ headerAlto+margen+1 +10,
+                                    0xFFFFFF, 0xFF0000 );
     }
 
 }
@@ -299,14 +290,10 @@ void movimientos(){
 
     while(!key[KEY_ESC] && !terminar)
     {
-
-        //if(mouse_x >= 470 &&  mouse_x <= 500 && mouse_y >= 23 &&  mouse_y <= 50){
-
-            if(mouse_b == 1)
-                pause = true;
-            if(mouse_b == 2)
-                pause = false;
-        //}
+        if(mouse_b == 1)
+            pause = true;
+        if(mouse_b == 2)
+            pause = false;
 
         if(!pause){
 
@@ -363,8 +350,9 @@ void movimientos(){
                         break;
                 }
 
-                textout_centre_ex(buffer, font, "ESC para terminar", pantallaAncho/2, headerAlto/2 + 45, 0xFFFFFF, 0x649043);
+                textout_centre_ex(buffer, font, "Direcciones: A-W-D-S", pantallaAncho/2, headerAlto/2 - 5, 0xFFFFFF, 0x567A3A);
                 textout_centre_ex(buffer, font, "Click Izq - Pausa / Click Der - Reanudar", pantallaAncho/2, headerAlto/2 + 20, 0xFFFFFF, 0x567A3A);
+                textout_centre_ex(buffer, font, "ESC para terminar", pantallaAncho/2, headerAlto/2 + 45, 0xFFFFFF, 0x649043);
 
                 ostringstream os;
 
@@ -400,8 +388,6 @@ void movimientos(){
 
                 serpiente.dibujarPosicion();
                 serpiente.borrarPosicion();
-
-                //masked_blit(pausa,buffer, 0,0, pantallaAncho/2 , headerAlto/2 - 14 ,27, 27);
 
                 pintar = true;
                 timer=0;
