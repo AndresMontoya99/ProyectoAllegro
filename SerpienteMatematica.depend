@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1600730986 source:c:\users\andre\desktop\proyectoallegro\main.cpp
+1600986831 source:c:\users\andre\desktop\proyectoallegro\main.cpp
 	<allegro.h>
 	<vector>
 	<stdio.h>
@@ -9,18 +9,19 @@
 	<sstream>
 	<fstream>
 	<nlohmann/json.hpp>
+	<conio.h>
 	"Adicional/VariablesGlobales.cpp"
 	"Clases/Serpiente.cpp"
 	"Adicional/Funciones.cpp"
 
-1600732040 c:\users\andre\desktop\proyectoallegro\adicional\variablesglobales.cpp
+1600992776 c:\users\andre\desktop\proyectoallegro\adicional\variablesglobales.cpp
 
-1600676960 c:\users\andre\desktop\proyectoallegro\clases\serpiente.cpp
+1601053814 c:\users\andre\desktop\proyectoallegro\clases\serpiente.cpp
 	"Coordenada.cpp"
 
 1600678227 c:\users\andre\desktop\proyectoallegro\clases\coordenada.cpp
 
-1600733678 c:\users\andre\desktop\proyectoallegro\adicional\funciones.cpp
+1601053407 c:\users\andre\desktop\proyectoallegro\adicional\funciones.cpp
 
 1600411708 source:c:\users\andre\desktop\old\proyectoallegro\main.cpp
 	<allegro.h>
@@ -42,4 +43,6 @@
 1600062135 c:\users\andre\desktop\old\proyectoallegro\clases\coordenada.cpp
 
 1600418325 c:\users\andre\desktop\old\proyectoallegro\adicional\funciones.cpp
+
+1600986635 source:c:\users\andre\desktop\proyectoallegro\resource.rc
 

@@ -39,11 +39,12 @@ int vidasMax;
 int vidasAumen;
 
 int timer;
-int tasa;
 int corte;
 int corteNivel;
 
 bool terminar;
+
+vector<string> opcionesJuego;
 
 BITMAP  *buffer;//formato BMP
 BITMAP  *fondo;  //100, 144, 67  0x649043
@@ -59,6 +60,7 @@ BITMAP  *copa2;
 BITMAP  *perder;
 BITMAP  *perder2;
 BITMAP  *explo;
+BITMAP  *pausa;
 
 
 // definimos el audio del programa

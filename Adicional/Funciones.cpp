@@ -18,6 +18,11 @@ void iniciarAlegro(){
 
     srand(time(0));
 
+    opcionesJuego.push_back("Libre");
+    opcionesJuego.push_back("Numeros Pares");
+    opcionesJuego.push_back("Multiplos de 5");
+    opcionesJuego.push_back("Salir");
+
     sonidoMenu  = load_wav("music/comeAndGetYourLove.wav");
     sonidoJuego = load_wav("music/animals.wav");
 
@@ -45,8 +50,7 @@ void iniciarValores(){
     tamano = 3;
 
     timer = 0;
-    tasa = 20;
-    corte = 10;
+    corte = 700;
     corteNivel = 5;
 
     vidas = 3;
@@ -79,6 +83,9 @@ void cargarImagenes(){
     perder = load_bitmap("img/Perder.bmp",NULL);
     perder2 = load_bitmap("img/Perder2.bmp",NULL);
 
+
+    pausa = load_bitmap("img/Pausa.bmp",NULL);
+
 }
 
 void montarImagenes(){
@@ -101,7 +108,6 @@ void cambiarPantalla(){
 
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, pantallaAncho, pantallaAlto, 0, 0);
     set_window_title(titulo.c_str());
-
 
     buffer = create_bitmap(pantallaAncho, pantallaAlto);
 }
@@ -130,8 +136,8 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
                 tamano++;
                 if(puntos % corteNivel == 0){
                     nivel++;
-                    if(tasa > 1)
-                        tasa -= 1;
+                    if(corte > 50)
+                        corte -= 50;
                 }
 
                 if(vidas < vidasMax && puntos % vidasAumen == 0){
@@ -188,7 +194,7 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
 }
 
 
-bool cargarPuntaje(){
+int cargarPuntaje(){
     json imagenes;
     ifstream people_file("json/Puntaje.json", ifstream::binary);
     people_file >> imagenes;
@@ -204,9 +210,8 @@ bool cargarPuntaje(){
         file << jsonfile;
     }
 
-    return high;
+    return imagenes["PuntajeMaximo"];
 }
-
 
 void imprimirResultado(){
 
@@ -215,56 +220,65 @@ void imprimirResultado(){
 
     headerAlto = 75;
 
-    titulo = "Serpiente Matematica - Puntaje Alto";
+    int record =  cargarPuntaje();
+    bool puntaje = puntos > record;
+
+    titulo = "Serpiente Matematica - Puntaje";
+    if(puntaje)
+        titulo += " Alto";
 
     cambiarPantalla();
     stop_sample(sonidoJuego);
     int rl = 1;
-    bool continuar = true;
 
-    bool puntaje = cargarPuntaje();
-
-    play_sample(((puntaje) ?  sonidoGanar  : sonidoPerder ),20,150,1000,1);
+    play_sample(((puntaje) ?  sonidoGanar  : sonidoPerder ),25,150,1000,1);
 
 
     do{
+        if(timer % 500 == 0){
 
-        clear(buffer);
-        montarImagenes();
+            clear(buffer);
+            montarImagenes();
+            ostringstream os;
 
-        ostringstream os;
+            if(puntaje){
 
-        if(puntaje){
+                os << "Nuevo Record: " << puntos;
+                textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
 
-            os << "Nuevo Record: " << puntos;
-            textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
+                masked_blit((rl == 0) ? copa : copa2,buffer, 0,0, pantallaAncho/2 - (170/2) ,margen + headerAlto+1 + (fondo2Alto/2) - (170/2) ,170, 177);
+            }else{
+                os << "Puntaje: " << puntos;
+                textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2 -10, 0xFFFFFF, 0x567A3A);
 
-            masked_blit((rl == 0) ? copa : copa2,buffer, 0,0, pantallaAncho/2 - (170/2) ,margen + headerAlto+1 + (fondo2Alto/2) - (170/2) ,170, 177);
-        }else{
-            os << "Puntaje: " << puntos;
-            textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
+                os.str("");
+                os << "Record: " << record;
+                textout_centre_ex(buffer, font, os.str().c_str(), pantallaAncho/2, headerAlto/2 + 10, 0xFFFFFF, 0x567A3A);
 
-            masked_blit((rl == 0) ? perder : perder2 ,buffer, 0,0, pantallaAncho/2 - (206/2) ,margen + headerAlto+1 + (fondo2Alto/2) - (206/2) ,206, 150);
+                masked_blit((rl == 0) ? perder : perder2 ,buffer, 0,0, pantallaAncho/2 - (206/2) ,margen + headerAlto+1 + (fondo2Alto/2) - (206/2) ,206, 150);
+            }
+
+            textout_centre_ex(buffer, font, "ESC para continuar", pantallaAncho/2, headerAlto/2 + 45, 0xFFFFFF, 0x649043);
+            rl = ((rl == 0) ? 1 : 0 );
+            timer = 0;
         }
-
-        rl = ((rl == 0) ? 1 : 0 );
 
         blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
+        timer++;
 
-        if(key[KEY_ESC]){
-            continuar = false;
-        }
+    }while(!key[KEY_ESC]);
 
-        rest(200);
+    timer = 0;
 
-    }while(continuar);
-
+    stop_sample(sonidoGanar);
+    stop_sample(sonidoPerder);
 }
 
 
 void movimientos(){
 
     bool pintar = true;
+    bool pause = false;
     int actual;
     terminar = false;
 
@@ -272,106 +286,121 @@ void movimientos(){
 
     while(!key[KEY_ESC] && !terminar)
     {
-        clear(buffer);
-        montarImagenes();
 
-        if(pintar){
-            actual = dir;
-            pintar = false;
-        }
+        //if(mouse_x >= 470 &&  mouse_x <= 500 && mouse_y >= 23 &&  mouse_y <= 50){
 
-        if (key[KEY_UP])
-        {
-            if(actual != 3)
-                dir = 1;
-            else
-                dir = actual;
+            if(mouse_b == 1)
+                pause = true;
+            if(mouse_b == 2)
+                pause = false;
+        //}
 
-        }else if(key[KEY_DOWN]){
+        if(!pause){
 
-            if(actual != 1)
-                dir = 3;
-            else
-                dir = actual;
-
-        }else if(key[KEY_RIGHT]){
-
-            if(actual != 4)
-                dir = 2;
-            else
-                dir = actual;
-
-        }else if(key[KEY_LEFT]){
-            if(actual != 2)
-                dir = 4;
-            else
-                dir = actual;
-        }
-
-        if(timer % corte == 0){
-
-
-            switch(dir){
-                case 1:
-                    y--;
-                    break;
-                case 2:
-                    x++;
-                    break;
-                case 3:
-                    y++;
-                    break;
-                case 4:
-                    x--;
-                    break;
+            if(pintar){
+                actual = dir;
+                pintar = false;
             }
 
-            ostringstream os;
+            if (key[KEY_W])
+            {
+                if(actual != 3)
+                    dir = 1;
+                else
+                    dir = actual;
 
-            os << "NIVEL  :";
-            textout_centre_ex(buffer, font, os.str().c_str(), 50, 10, 0xFFFFFF, 0x567A3A);
-            os.str("");
-            os << nivel;
-            textout_centre_ex(buffer, font, os.str().c_str(), 115, 10, 0xFFFFFF, 0x567A3A);
-            os.str("");
+            }else if(key[KEY_S]){
 
+                if(actual != 1)
+                    dir = 3;
+                else
+                    dir = actual;
 
-            os << "PUNTOS :";
-            textout_centre_ex(buffer, font, os.str().c_str(), 50, 30, 0xFFFFFF, 0x567A3A);
-            os.str("");
-            os << puntos;
-            textout_centre_ex(buffer, font, os.str().c_str(), 115, 30, 0xFFFFFF, 0x567A3A);
-            textout_centre_ex(buffer, font, "Libre", pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
+            }else if(key[KEY_D]){
 
-            for(int i = 0 ; i < vidas ; i++ ){
-                masked_blit(vida,buffer, 0,0, (i+1)*(margen+1), 46,imgVida,imgVida);
+                if(actual != 4)
+                    dir = 2;
+                else
+                    dir = actual;
+
+            }else if(key[KEY_A]){
+                if(actual != 2)
+                    dir = 4;
+                else
+                    dir = actual;
             }
 
-            serpiente.guardarPosicion();
+            if(timer % corte == 0){
 
-            if(objetivoXY.size() > 0){
-                bool comer = false;
-                for(int i = 0 ; i < objetivoXY.size() && !comer ; i++){
-                    comer = x == objetivoXY[i].getX() && y == objetivoXY[i].getY();
-                    dibujarObjetivo(comer,false,i);
+                clear(buffer);
+                montarImagenes();
+
+                switch(dir){
+                    case 1:
+                        y--;
+                        break;
+                    case 2:
+                        x++;
+                        break;
+                    case 3:
+                        y++;
+                        break;
+                    case 4:
+                        x--;
+                        break;
                 }
-            }else{
-                dibujarObjetivo(true, true);
+
+                textout_centre_ex(buffer, font, "ESC para terminar", pantallaAncho/2, headerAlto/2 + 45, 0xFFFFFF, 0x649043);
+                textout_centre_ex(buffer, font, "Click Izq - Pausa / Click Der - Reanudar", pantallaAncho/2, headerAlto/2 + 20, 0xFFFFFF, 0x567A3A);
+
+                ostringstream os;
+
+                os << "NIVEL  :";
+                textout_centre_ex(buffer, font, os.str().c_str(), 50, 10, 0xFFFFFF, 0x567A3A);
+                os.str("");
+                os << nivel;
+                textout_centre_ex(buffer, font, os.str().c_str(), 115, 10, 0xFFFFFF, 0x567A3A);
+                os.str("");
+
+
+                os << "PUNTOS :";
+                textout_centre_ex(buffer, font, os.str().c_str(), 50, 30, 0xFFFFFF, 0x567A3A);
+                os.str("");
+                os << puntos;
+                textout_centre_ex(buffer, font, os.str().c_str(), 115, 30, 0xFFFFFF, 0x567A3A);
+
+                for(int i = 0 ; i < vidas ; i++ ){
+                    masked_blit(vida,buffer, 0,0, (i+1)*(margen+1), 46,imgVida,imgVida);
+                }
+
+                serpiente.guardarPosicion();
+
+                if(objetivoXY.size() > 0){
+                    bool comer = false;
+                    for(int i = 0 ; i < objetivoXY.size() && !comer ; i++){
+                        comer = x == objetivoXY[i].getX() && y == objetivoXY[i].getY();
+                        dibujarObjetivo(comer,false,i);
+                    }
+                }else{
+                    dibujarObjetivo(true, true);
+                }
+
+                serpiente.dibujarPosicion();
+                serpiente.borrarPosicion();
+
+                //masked_blit(pausa,buffer, 0,0, pantallaAncho/2 , headerAlto/2 - 14 ,27, 27);
+
+                pintar = true;
+                timer=0;
             }
 
-            serpiente.dibujarPosicion();
-            serpiente.borrarPosicion();
-
-            blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
-
-            pintar = true;
-            timer=0;
+            timer++;
         }
 
-        timer++;
-        rest(tasa);
-    }
+        show_mouse(buffer);
+        blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
 
+    }
 
     imprimirResultado();
 }
@@ -385,13 +414,13 @@ void imprimirJuego(){
 
     headerAlto = 75;
 
-    titulo = "Serpiente Matematica - Juego";
+    titulo = "Serpiente Matematica - Juego / " + opcionesJuego[modoJuego-1];
 
     cambiarPantalla();
     cargarImagenes();
     montarImagenes();
 
-    play_sample(sonidoJuego,10,150,1000,1);
+    play_sample(sonidoJuego,25,150,1000,1);
 
     movimientos();
 }
@@ -410,62 +439,25 @@ void imprimirMenu(){
     cargarImagenes();
     montarImagenes();
 
-    vector<string> opciones;
 
     bool continuar = true;
 
-    opciones.push_back("Libre");
-    opciones.push_back("Numeros Pares");
-    opciones.push_back("Multiplos de 5");
-    opciones.push_back("Salir");
+    int tam = opcionesJuego.size();
 
+    play_sample(sonidoMenu,25,150,1000,1);
 
-    play_sample(sonidoMenu,20,150,1000,1);
 
     do
     {
-        clear(buffer);
 
+        clear(buffer);
         montarImagenes();
 
         textout_centre_ex(buffer, font, "Seleccione Modo de Juego", pantallaAncho/2, headerAlto/2, 0xFFFFFF, 0x567A3A);
 
-        int tam = opciones.size();
+        for(int i = 0 ; i < opcionesJuego.size() ; i++){
 
-
-
-        if(keypressed()){
-
-            char letra = readkey() >> 8;
-
-            switch(letra){
-
-                case KEY_UP:
-                    modoJuego--;
-                    if(modoJuego == 0)
-                        modoJuego = tam;
-
-                    break;
-
-                case KEY_DOWN:
-                    modoJuego++;
-                    if(modoJuego > tam)
-                        modoJuego = 1;
-                    break;
-
-                case KEY_ENTER:
-                    continuar = false;
-                    break;
-
-                case KEY_ESC:
-                    continuar = false;
-                    break;
-            }
-        }
-
-        for(int i = 0 ; i < opciones.size() ; i++){
-
-            string str = opciones[i];
+            string str = opcionesJuego[i];
 
             if((i+1 == modoJuego)) {
                 if(str.find("-> ") == -1)
@@ -479,11 +471,38 @@ void imprimirMenu(){
                                ((i+1 == modoJuego) ? 0x000000 : 0xFFFFFF ),((i+1 == modoJuego) ? 0xFFFFFF : 0xB6DE6B ) );
         }
 
+        if(mouse_x >= 188 &&  mouse_x <= 253 && mouse_y >= 178 &&  mouse_y <= 186){
+            modoJuego = 1;
+
+            if(mouse_b == 1)
+                continuar = false;
+
+        }
+
+        if(mouse_x >= 156 &&  mouse_x <= 285 && mouse_y >= 217 &&  mouse_y <= 226){
+            modoJuego = 2;
+
+            if(mouse_b == 1)
+                continuar = false;
+        }
+
+        if(mouse_x >= 152 &&  mouse_x <= 287 && mouse_y >= 258 &&  mouse_y <= 265){
+            modoJuego = 3;
+
+            if(mouse_b == 1)
+                continuar = false;
+        }
+
+        if(mouse_x >= 189 &&  mouse_x <= 252 && mouse_y >= 298 &&  mouse_y <= 305){
+            modoJuego = 4;
+
+            if(mouse_b == 1)
+                continuar = false;
+        }
+
+        show_mouse(buffer);
+
         blit(buffer,screen, 0,0,0,0,pantallaAncho,pantallaAlto);
-        rest(50);
 
     }while(continuar);
-
-
-    imprimirJuego();
 }

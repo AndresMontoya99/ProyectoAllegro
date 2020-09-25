@@ -10,6 +10,8 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include <conio.h>
+
 #include "Adicional/VariablesGlobales.cpp"
 #include "Clases/Serpiente.cpp"
 #include "Adicional/Funciones.cpp"
@@ -18,8 +20,13 @@ int main()
 {
     iniciarAlegro();
 
-    iniciarValores();;
-    imprimirMenu();
+    do{
+        iniciarValores();
+        imprimirMenu();
+        if(modoJuego != 4)
+            imprimirJuego();
+
+    }while(modoJuego != 4);
 
     destroy_bitmap(buffer);
     destroy_bitmap(fondo);
