@@ -56,6 +56,7 @@ class Serpiente{
                         masked_blit(img,buffer, 0,0,(posiciones[i].getX()*imgSerpiente)+margen+1,(posiciones[i].getY()*imgSerpiente)+ headerAlto+margen+1 , imgSerpiente,imgSerpiente);
                     }
                 }
+
             }else{
                 if(dir != 2 && dir != 3){
                     dir = 2;
@@ -68,7 +69,7 @@ class Serpiente{
                 y = 0;
                 vidas--;
                 posiciones.clear();
-                posiciones.push_back(Coordenada(x,y));
+                guardarPosicion();
                 terminar = false;
                 rest(100);
             }
@@ -76,10 +77,8 @@ class Serpiente{
 
         void borrarPosicion(){
 
-            if(posiciones.size() == tamano){
-                Coordenada c = posiciones.at(0);
+            if(posiciones.size() == tamano)
                 posiciones.erase(posiciones.begin());
-            }
         }
 
         void posicionDisponible(){

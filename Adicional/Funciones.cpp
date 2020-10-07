@@ -63,7 +63,6 @@ void iniciarValores(){
     serpiente.guardarPosicion();
 
     objetivoXY = vector<Coordenada>{};
-    serpiente.guardarPosicion();
 }
 
 
@@ -79,7 +78,6 @@ void cargarImagenes(){
 
     copa = load_bitmap("img/Copa.bmp",NULL);
     copa2 = load_bitmap("img/Copa2.bmp",NULL);
-    explo = load_bitmap("img/Explosion.bmp",NULL);
     perder = load_bitmap("img/Perder.bmp",NULL);
     perder2 = load_bitmap("img/Perder2.bmp",NULL);
 
@@ -416,8 +414,6 @@ void imprimirJuego(){
     titulo = "Serpiente Matematica - Juego / " + opcionesJuego[modoJuego-1];
 
     cambiarPantalla();
-    cargarImagenes();
-    montarImagenes();
 
     play_sample(sonidoJuego,25,150,1000,1);
 
@@ -436,7 +432,7 @@ void imprimirMenu(){
 
     cambiarPantalla();
     cargarImagenes();
-    montarImagenes();
+    //montarImagenes();
 
 
     bool continuar = true;

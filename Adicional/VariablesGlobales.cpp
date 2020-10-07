@@ -59,7 +59,6 @@ BITMAP  *copa;
 BITMAP  *copa2;
 BITMAP  *perder;
 BITMAP  *perder2;
-BITMAP  *explo;
 
 SAMPLE *sonidoMenu;
 SAMPLE *sonidoJuego;
