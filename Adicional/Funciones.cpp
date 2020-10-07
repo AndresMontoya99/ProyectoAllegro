@@ -184,7 +184,7 @@ void dibujarObjetivo(bool actualizar = false, bool primera = false, int index = 
 
 
 int cargarPuntaje(){
-    json imagenes;
+    json puntajeJson;
     string file = "json/Puntaje.json";
 
     if (!ifstream(file)){
@@ -199,9 +199,9 @@ int cargarPuntaje(){
     }
 
     ifstream puntos_file(file, ifstream::binary);
-    puntos_file >> imagenes;
+    puntos_file >> puntajeJson;
 
-    bool high = puntos > imagenes["PuntajeMaximo"];
+    bool high = puntos > puntajeJson["PuntajeMaximo"];
 
     if(high){
         json jsonfile;
@@ -212,7 +212,7 @@ int cargarPuntaje(){
         file_puntos << jsonfile;
     }
 
-    return imagenes["PuntajeMaximo"];
+    return puntajeJson["PuntajeMaximo"];
 }
 
 void imprimirResultado(){
